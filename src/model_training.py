@@ -5,7 +5,7 @@ from keras.layers import LSTM
 from keras.layers import Activation
 from keras.callbacks import ModelCheckpoint
 
-def create_network(n_vocab):
+def create_network(network_input, n_vocab):
     """ Create network structure """
     model = Sequential()
 
@@ -23,7 +23,7 @@ def create_network(n_vocab):
     model.add(Dense(n_vocab))
     model.add(Activation("softmax"))
 
-    model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
+    model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=['accuracy'])
 
     return model
 
@@ -41,3 +41,17 @@ def train(model, network_input, network_output):
     callbacks_list = [checkpoint]
 
     model.fit(network_input, network_output, epochs=40, batch_size=64, callbacks=callbacks_list)
+
+
+def train_network():
+    """ Call all the functions and train the LSTM"""
+    
+    notes = generatenotes()
+
+    n_vocab = len(set(notes))
+
+    network_input, network_output = sequence(notes, n_vocab)
+
+    model = create_network(network_input,n_vocab)
+
+    train(model, network_input, network_output)
